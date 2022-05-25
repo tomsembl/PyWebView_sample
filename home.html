@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <link rel= "stylesheet" type= "text/css" href= "style.css">
+    </head>
+    <body>
+        <div class="pywebview-drag-region">
+            <p class="window-title">End RD Session</p>
+            <div class="top-right">
+                <button class="min" onclick="minimise()"><img src="minimize.svg"></button>
+                <button class="clo" onclick="close_window()"><img src="x-close.svg"></button>
+            </div>
+        </div>
+        <div id="hero" class="hero">
+            <input id="username_input" type="search" placeholder="🔍︎ Search Username..." oninput="typed(this)" maxlength="20">
+        </div>
+        <script>
+
+            var username_input = document.getElementById("username_input")
+            username_input.focus()
+
+            function swap_value(str){
+                webview.api.printt(str)
+                username_input.value = str
+                close_autocomplete()
+            }
+            function close_autocomplete(){
+                var div = document.getElementById("autocomplete-div")
+                if(div){div.remove()}
+            }
+            function show_autocomplete(response){
+                const list = response[0]
+                const text_input = response[1]
+                const l = text_input.length
+                var hero = document.getElementById("hero")
+                close_autocomplete()
+                var new_div = document.createElement('DIV')
+                new_div.setAttribute("id", "autocomplete-div");
+                new_div.setAttribute("class", "autocomplete-div");
+                hero.appendChild(new_div)
+                var div = document.getElementById("autocomplete-div")
+                for (const f of list) {
+                    var new_sub_div = document.createElement('DIV')
+                    new_sub_div.innerHTML = `<strong>${f.slice(0,l)}</strong>${f.slice(l)}`//<input type="hidden" value="${f}">`
+                    new_sub_div.addEventListener('click', function(){
+                        webview.api.printt(f)
+                        swap_value(f)
+                    })
+                    div.appendChild(new_sub_div)
+                }
+            }
+            function close_window(){pywebview.api.close_window()}
+            function minimise(){pywebview.api.minimise()}
+            function typed(text_input){
+                if (text_input.value.length == 0){close_autocomplete()}
+                pywebview.api.get_AD_list(text_input.value).then(show_autocomplete)
+            }
+        </script>
+    </body>
+    
